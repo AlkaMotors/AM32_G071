@@ -1,0 +1,13 @@
+main.c:256:6:loadEEpromSettings	32	static
+main.c:328:6:saveEEpromSettings	8	static
+main.c:371:6:initAfterJump	16	static,ignoring_inline_asm
+main.c:398:6:getBemfState	0	static
+main.c:427:6:commutate	16	static
+main.c:461:6:tenKhzRoutine	16	static,ignoring_inline_asm
+main.c:541:6:interruptRoutine	8	static
+main.c:585:6:advanceincrement	12	static
+main.c:625:6:PeriodElapsedCallback	24	static
+main.c:652:6:startMotor	24	static
+main.c:663:6:zcfoundroutine	24	static
+main.c:705:5:main	80	static
+main.c:1182:6:Error_Handler	0	static

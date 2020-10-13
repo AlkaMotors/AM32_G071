@@ -1,0 +1,3 @@
+WS2812.c:14:6:send_LED_DMA	0	static
+WS2812.c:28:6:send_LED_RGB	20	static
+WS2812.c:44:6:WS2812_Init	176	static

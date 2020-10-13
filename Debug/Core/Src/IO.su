@@ -1,0 +1,8 @@
+IO.c:29:6:changeToInput	0	static
+IO.c:46:6:receiveDshotDma	0	static
+IO.c:68:6:changeToOutput	0	static
+IO.c:83:6:sendDshotDma	0	static
+IO.c:104:6:detectInput	20	static
+IO.c:170:6:computeMSInput	16	static
+IO.c:185:6:computeServoInput	24	static
+IO.c:208:6:transfercomplete	24	static

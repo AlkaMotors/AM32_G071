@@ -1,0 +1,4 @@
+sounds.c:12:6:playStartupTune	8	static
+sounds.c:33:6:playDuskingTune	16	static
+sounds.c:60:6:playInputTune2	8	static,ignoring_inline_asm
+sounds.c:86:6:playInputTune	8	static,ignoring_inline_asm

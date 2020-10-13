@@ -1,0 +1,2 @@
+dshot.c:40:6:computeDshotDMA	72	static
+dshot.c:177:6:make_dshot_package	20	static

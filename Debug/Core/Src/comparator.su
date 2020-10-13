@@ -1,0 +1,2 @@
+comparator.c:12:6:maskPhaseInterrupts	0	static
+comparator.c:17:6:changeCompInput	0	static

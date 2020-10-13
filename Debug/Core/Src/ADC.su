@@ -1,0 +1,4 @@
+ADC.c:26:6:ADC_DMA_Callback	0	static
+ADC.c:49:6:Configure_DMA	16	static
+ADC.c:192:6:activateADC	16	static
+ADC.c:409:6:Configure_ADC	32	static

@@ -1,0 +1,2 @@
+eeprom.c:19:6:save_flash_nolib	56	dynamic
+eeprom.c:82:6:read_flash_bin	20	static
