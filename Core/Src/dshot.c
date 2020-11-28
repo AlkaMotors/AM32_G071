@@ -42,7 +42,7 @@ void computeDshotDMA(){
 
 int j = 0;
 dshot_frametime = dma_buffer[31]- dma_buffer[0];
-	         if((dshot_frametime < 1690)&&(dshot_frametime > 1630)){
+	         if((dshot_frametime < 1690)&&(dshot_frametime > 1600)){
 
 
 				for (int i = 0; i < 16; i++){

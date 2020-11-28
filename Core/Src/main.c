@@ -1,5 +1,4 @@
 
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -16,11 +15,8 @@
 #include "comparator.h"
 #include "IO.h"
 
-int Erik_count = 0;
-
-
 uint8_t version_major = 1;
-uint8_t version_minor = 57;
+uint8_t version_minor = 60;
 
 uint8_t device_name[12] = FIRMWARE_NAME ;
 
@@ -75,7 +71,7 @@ uint32_t last_average_interval;
 int e_com_time;
 char desync_check = 0;
 uint16_t ADC_smoothed_input = 0;
-uint8_t degrees_celsius;
+char degrees_celsius;
 uint16_t ADC_raw_temp;
 uint16_t ADC_raw_volts;
 uint16_t ADC_raw_current;
@@ -105,8 +101,8 @@ uint8_t last_dshot_command = 0;
 char old_routine = 0;
 int adjusted_input;
 
-#define TEMP30_CAL_VALUE            ((uint16_t*)((uint32_t)0x1FFFF7B8))
-#define TEMP110_CAL_VALUE           ((uint16_t*)((uint32_t)0x1FFFF7C2))
+//#define TEMP30_CAL_VALUE            ((uint16_t*)((uint32_t)0x1FFFF7B8))
+//#define TEMP110_CAL_VALUE           ((uint16_t*)((uint32_t)0x1FFFF7C2))
 
 int temp110cal;
 int temp30cal;
@@ -352,25 +348,25 @@ void saveEEpromSettings(){
 void initAfterJump(){
 
 	SCB->VTOR = 0x08001000;
-    do {
-       volatile uint32_t tmpreg;
-       ((((RCC_TypeDef *) ((((uint32_t)0x40000000U) + 0x00020000) + 0x00001000))->AHBENR) |= ((0x1U << (0U))));
-           /* Delay after an RCC peripheral clock enabling */
-      tmpreg = ((((RCC_TypeDef *) ((((uint32_t)0x40000000U) + 0x00020000) + 0x00001000))->AHBENR) & ((0x1U << (0U))));
-         ((void)(tmpreg));
-          } while(0U);
-  //	  /* Remap SRAM at 0x00000000 */
-    do {((SYSCFG_TypeDef *) (((uint32_t)0x40000000U) + 0x00010000))->CFGR1 &= ~((0x3U << (0U)));
-        ((SYSCFG_TypeDef *) (((uint32_t)0x40000000U) + 0x00010000))->CFGR1 |= ((0x1U << (0U)) | (0x2U << (0U)));
-      }while(0);
-
-    if (SysTick_Config(SystemCoreClock / 1000))
-     {
-       /* Capture error */
-       while (1)
-       {
-       }
-     }
+//    do {
+//       volatile uint32_t tmpreg;
+//       ((((RCC_TypeDef *) ((((uint32_t)0x40000000U) + 0x00020000) + 0x00001000))->APBENR2) |= ((0x1U << (0U))));
+//           /* Delay after an RCC peripheral clock enabling */
+//      tmpreg = ((((RCC_TypeDef *) ((((uint32_t)0x40000000U) + 0x00020000) + 0x00001000))->APBENR2) & ((0x1U << (0U))));
+//         ((void)(tmpreg));
+//          } while(0U);
+//  //	  /* Remap SRAM at 0x00000000 */
+//    do {((SYSCFG_TypeDef *) (((uint32_t)0x40000000U) + 0x00010000))->CFGR1 &= ~((0x3U << (0U)));
+//        ((SYSCFG_TypeDef *) (((uint32_t)0x40000000U) + 0x00010000))->CFGR1 |= ((0x1U << (0U)) | (0x2U << (0U)));
+//      }while(0);
+//
+//    if (SysTick_Config(SystemCoreClock / 1000))
+//     {
+//       /* Capture error */
+//       while (1)
+//       {
+//       }
+//     }
     __enable_irq();
 }
 
@@ -440,19 +436,20 @@ if(commutation_interval > 4000 && crawler_mode){
 
 
 void tenKhzRoutine(){
+	if(!stepper_sine){
 	TIM1->ARR = tim1_arr;
 
 	TIM1->CCR1 = adjusted_duty_cycle;
 	TIM1->CCR2 = adjusted_duty_cycle;
 	TIM1->CCR3 = adjusted_duty_cycle;
-
+	}
 average_interval = e_com_time / 3;
 if(desync_check){
 //	if(step==6){       // desync check
 		if(getAbsDif(average_interval,last_average_interval) > average_interval >> 1 && (zero_crosses > 40)){ //throttle resitricted before zc 40.
-			zero_crosses = 6;
-running = 0;
-old_routine = 1;
+			zero_crosses = 5;
+//running = 0;
+//old_routine = 1;
 		}
 		last_average_interval = average_interval;
 		desync_check = 0;
@@ -555,7 +552,7 @@ if (stuckcounter > 100){
 							maskPhaseInterrupts();
 							LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_18);
 							LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_18);
-							Erik_count++;
+
 			TIM2->CNT = 0;
 			TIM14->CNT = 0;
 			TIM14->ARR = waitTime;
@@ -607,7 +604,7 @@ void PeriodElapsedCallback(){
 			count++;
 			TIM14->DIER &= ~((0x1UL << (0U)));             // disable interrupt
 			commutate();
-			commutation_interval = ((commutation_interval) + thiszctime)>>1;
+			commutation_interval = ((3*commutation_interval) + thiszctime)>>2;
             advance = (commutation_interval>>3) * advance_level;   // 60 divde 8 7.5 degree increments
 			waitTime = (commutation_interval >>1)  - advance;
 			//	blanktime = commutation_interval / 8; // no blanktime /demag , if the motor is accelerating fast the next zc can happen right after commutation
@@ -627,7 +624,9 @@ void PeriodElapsedCallback(){
 									EXTI->IMR1 |= (1 << 18);     // enable comp interrupt
 									}
 #endif
+			if(zero_crosses < 10000){
 			zero_crosses++;
+			}
 }
 
 void startMotor() {
@@ -692,7 +691,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  
+
 
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
@@ -771,19 +770,24 @@ playStartupTune();
   maskPhaseInterrupts();
   MX_IWDG_Init();
    LL_IWDG_ReloadCounter(IWDG);
-//   ADC_Init();
+
+ //  my routines
+      ADC_Init();
 //
-//   activateADC();
+   Activate_ADC();
 //   enableADC_DMA();
-   Configure_DMA();
-   Configure_ADC();
-    activateADC();
+
+
+ //cube routines
+//   Configure_DMA();
+//   Configure_ADC();
+//    activateADC();
 
     WS2812_Init();
 
     loadEEpromSettings();
 
-   if(version_major != eepromBuffer[3]  && version_minor > eepromBuffer[4]){
+   if(version_major != eepromBuffer[3]  || version_minor != eepromBuffer[4]){
  	  eepromBuffer[3] = version_major;
  	  eepromBuffer[4] = version_minor;
  	  for(int i = 0; i < 12 ; i ++){
@@ -810,18 +814,26 @@ playStartupTune();
 
 	  adc_counter++;
 	 	  if(adc_counter>500){   // for testing adc and telemetry
-	 		  degrees_celsius = __LL_ADC_CALC_TEMPERATURE(3000,  ADC_raw_temp, LL_ADC_RESOLUTION_12B);
-	 		// degrees_celsiuss = __LL_ADC_CALC_TEMPERATURE(VDDA_APPLI, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
-	 		  LL_ADC_REG_StartConversion(ADC1);
 
+	 		 if(LL_ADC_IsActiveFlag_EOC(ADC1) == 1){
+	 		 ADC_raw_temp = LL_ADC_REG_ReadConversionData12(ADC1);
+
+
+
+	 		  degrees_celsius = __LL_ADC_CALC_TEMPERATURE(3300,  ADC_raw_temp, LL_ADC_RESOLUTION_12B);
+	 		// degrees_celsius = __LL_ADC_CALC_TEMPERATURE(VDDA_APPLI, ADC_raw_temp, LL_ADC_RESOLUTION_12B);
+
+	 		 }else{
+	 			LL_ADC_REG_StartConversion(ADC1);
+	 		 }
 	 		  adc_counter = 0;
-	 #ifdef USE_ADC_INPUT
-	 		  if(ADC_raw_input < 10){
-	 			  zero_input_count++;
-	 		  }else{
-	 			  zero_input_count=0;
-	 		  }
-	 #endif
+//	 #ifdef USE_ADC_INPUT
+//	 		  if(ADC_raw_input < 10){
+//	 			  zero_input_count++;
+//	 		  }else{
+//	 			  zero_input_count=0;
+//	 		  }
+//	 #endif
 	 	  }
 	 #ifdef USE_ADC_INPUT
 

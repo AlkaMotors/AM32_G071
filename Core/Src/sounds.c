@@ -10,6 +10,8 @@
 
 
 void playStartupTune(){
+	__disable_irq();
+	TIM1->PSC = 60;
 	TIM1->CCR1 = 10; // volume of the beep, (duty cycle) don't go above 25 out of 2000
 	TIM1->CCR2 = 10;
 	TIM1->CCR3 = 10;
@@ -26,7 +28,8 @@ void playStartupTune(){
 	TIM1->PSC = 25;         // higher again..
 	delayMillis(200);
 	allOff();                // turn all channels low again
-	TIM1->PSC = 1;           // set prescaler back to 0.
+	TIM1->PSC = 1;           // set prescaler back to 1.
+	__enable_irq();
 }
 
 

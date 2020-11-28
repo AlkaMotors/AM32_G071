@@ -188,7 +188,7 @@ void DMA1_Channel2_3_IRQHandler(void)
 	    /* Clear flag DMA global interrupt */
 	    /* (global interrupt flag: half transfer and transfer complete flags) */
 	    LL_DMA_ClearFlag_GI2(DMA1);
-	    ADC_DMA_Callback();
+	//    ADC_DMA_Callback();
 	    /* Call interruption treatment function */
 	 //   AdcDmaTransferComplete_Callback();
 	  }
