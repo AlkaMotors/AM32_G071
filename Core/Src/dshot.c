@@ -34,7 +34,9 @@ extern int e_com_time;
 extern char send_telemetry;
       // delay after getting dshot signal before changing over to output
 int dshot_full_number;
-
+extern char play_tone_flag;
+uint8_t command_count = 0;
+uint8_t last_command = 0;
 
 
 void computeDshotDMA(){
@@ -97,40 +99,50 @@ dshot_frametime = dma_buffer[31]- dma_buffer[0];
 
 						newinput = tocheck;
 	                    dshotcommand = 0;
+	                    command_count = 0;
 	                    return;
 					}
 
 				if ((tocheck <= 47)&& (tocheck > 0)){
 					newinput = 0;
 					dshotcommand = tocheck;    //  todo
+					command_count = 0;
 				}
 				if (tocheck == 0){
 					newinput = 0;
 					dshotcommand = 0;
 				}
-
-
-
-			//	break;
-
 				if ((dshotcommand > 0) && (running == 0) && armed) {
+					if(dshotcommand != last_command){
+						last_command = dshotcommand;
+						command_count = 0;
+					}
+					if(dshotcommand < 5){    // beacons
+					command_count = 6;      //go on right away
+					}
+					command_count++;
+					if(command_count >= 6){
+						command_count = 0;
+
 					switch (dshotcommand){                   // todo
 
-
-					case 1:
-					//	playInputTune();
-					break;
-
-					case 2:
-					//	playInputTune2();
-				    break;
-
+				   case 1:
+				        playInputTune();
+				   break;
+				   case 2:
+						playInputTune2();
+				   break;
+				   case 3:
+						playBeaconTune3();
+				   break;
 					case 7:
 						dir_reversed = 0;
+						play_tone_flag = 1;
 				    break;
 
 				    case 8:
 				    	dir_reversed = 1;
+				    	play_tone_flag = 2;
 				    break;
 
 					case 9:
@@ -146,10 +158,8 @@ dshot_frametime = dma_buffer[31]- dma_buffer[0];
 				    break;
 
 					case 12:
-						//	storeEEpromConfig();
-					while (1) {   // resets esc as iwdg times out
-
-					}
+					saveEEpromSettings();
+				    NVIC_SystemReset();
 				    break;
 
 					case 20:
@@ -165,6 +175,7 @@ dshot_frametime = dma_buffer[31]- dma_buffer[0];
 
 					last_dshot_command = dshotcommand;
 					dshotcommand = 0;
+				}
 				}
 				}else{
 					dshot_badcounts++;

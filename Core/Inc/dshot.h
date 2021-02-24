@@ -11,14 +11,14 @@
 #define INC_DSHOT_H_
 
 
-
-
-
 void computeDshotDMA(void);
 void make_dshot_package();
 
 extern void playInputTune(void);
 extern void playInputTune2(void);
+extern void playBeaconTune3(void);
+extern void saveEEpromSettings(void);
+
 extern uint32_t gcr[];
 extern int newinput;
 extern int dshot_frametime;

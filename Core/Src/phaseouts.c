@@ -11,7 +11,6 @@
 extern char comp_pwm;
 extern char prop_brake_active;
 
-
 #ifndef PWM_ENABLE_BRIDGE
 void phaseBPWM() {
 		if(!comp_pwm  || prop_brake_active){            // for future
@@ -190,8 +189,9 @@ void phaseALOW() {
 
 
 
-#endif	
-	void allOff(){
+#endif
+
+void allOff(){
 	phaseAFLOAT();
 	phaseBFLOAT();
 	phaseCFLOAT();

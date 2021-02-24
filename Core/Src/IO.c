@@ -149,11 +149,11 @@ void detectInput(){
 ////	if ((smallestnumber > 3000 )&&(smallestnumber < 7000)){
 ////		oneshot125 = 1;
 ////	}
-	if (smallestnumber > 6000){
+	if (smallestnumber > 1500){
 		servoPwm = 1;
 		ic_timer_prescaler=63;
 		armed_count_threshold = 100;
-		buffersize = 4;
+		buffersize = 2;
 	}
 
 	if (smallestnumber == 0){
@@ -185,9 +185,9 @@ void computeMSInput(){
 void computeServoInput(){
 
 	int lastnumber = dma_buffer[0];
-	for ( int j = 1 ; j < 3; j++){
+	for ( int j = 1 ; j < 2; j++){
 
-		if(((dma_buffer[j] - lastnumber) >1000 ) && ((dma_buffer[j] - lastnumber) < 2010)){ // blank space
+		if(((dma_buffer[j] - lastnumber) >900 ) && ((dma_buffer[j] - lastnumber) < 2150)){ // blank space
 
 			servorawinput = map((dma_buffer[j] - lastnumber), 1030, 2000, 0, 2000);
 
@@ -270,8 +270,10 @@ if(dshot_telemetry){
 		if  (servoPwm == 1){
 			computeServoInput();
 			IC_TIMER_REGISTER->CNT = 0;
-			signaltimeout = 0;
-			receiveDshotDma();
+			LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, LL_TIM_IC_POLARITY_RISING); // setup rising pin trigger.
+     		receiveDshotDma();
+     		signaltimeout = 0;
+     	    LL_DMA_EnableIT_HT(DMA1, INPUT_DMA_CHANNEL);
 		}
 
 	}

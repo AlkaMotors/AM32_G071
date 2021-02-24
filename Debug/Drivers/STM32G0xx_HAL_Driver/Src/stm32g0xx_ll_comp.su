@@ -1,3 +1,0 @@
-stm32g0xx_ll_comp.c:131:13:LL_COMP_DeInit	0	static
-stm32g0xx_ll_comp.c:168:13:LL_COMP_Init	8	static
-stm32g0xx_ll_comp.c:224:6:LL_COMP_StructInit	0	static

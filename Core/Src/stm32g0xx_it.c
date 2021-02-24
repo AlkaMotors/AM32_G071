@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ADC.h"
+#include "targets.h"
 #include "WS2812.h"
 /* USER CODE END Includes */
 
@@ -67,6 +68,7 @@ extern void tenKhzRoutine();
 
 extern int count;
 int update_interupt = 0;
+extern char servoPwm;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -154,7 +156,10 @@ void DMA1_Channel1_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
 	if(LL_DMA_IsActiveFlag_HT1(DMA1)){
-
+		if(servoPwm){
+		LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, LL_TIM_IC_POLARITY_FALLING);
+		 LL_DMA_ClearFlag_HT1(DMA1);
+		}
 	}
 	  if(LL_DMA_IsActiveFlag_TC1(DMA1) == 1)
 	  {
@@ -188,7 +193,7 @@ void DMA1_Channel2_3_IRQHandler(void)
 	    /* Clear flag DMA global interrupt */
 	    /* (global interrupt flag: half transfer and transfer complete flags) */
 	    LL_DMA_ClearFlag_GI2(DMA1);
-	//    ADC_DMA_Callback();
+	    ADC_DMA_Callback();
 	    /* Call interruption treatment function */
 	 //   AdcDmaTransferComplete_Callback();
 	  }

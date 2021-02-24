@@ -1,4 +1,0 @@
-functions.c:10:6:map	8	static
-functions.c:23:5:getAbsDif	0	static
-functions.c:32:6:delayMicros	0	static
-functions.c:39:6:delayMillis	0	static
